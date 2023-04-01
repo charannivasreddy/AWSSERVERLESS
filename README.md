@@ -21,52 +21,6 @@ STEP 4 :
 After writing the code click on Deploy…this helps to save the code and finds the erros if any present in the code, if there any errors then it will show where the error was present.
  
 
-CODE FOR THE LAMBDA FUNCTION :
-
-import boto3
-
-topic_arn = "arn:aws:sns:ap-south-1:697914187896:MYTOPIC"
-
-def send_sns(message, subject):
-    try:
-        client = boto3.client("sns")
-        result = client.publish(TopicArn=topic_arn, Message=message, Subject=subject)
-        if result['ResponseMetadata']['HTTPStatusCode'] == 200:
-            print(result)
-            print("Notification sent successfully..!!!")
-            return True
-    except Exception as e:
-        print("Error occured while publishing notification and error is : ", e)
-        return False
-
-def lambda_handler(event, context):
-    print("event collected is {}".format(event))
-    for record in event['Records'] :
-        s3_bucket = record['s3']['bucket']['name']
-        print("Bucket name is {}".format(s3_bucket))
-        s3_key = record['s3']['object']['key']
-        print("Bucket key name is {}".format(s3_key))
-        event_name = record['eventName']
-        print("Event name is {}".format(event_name))
-        if "ObjectCreated" in event_name:
-            from_path = "s3://{}/{}".format(s3_bucket, s3_key)
-            message = "Your file is uploaded successfully to S3 bucket path: {}".format(from_path)
-            subject = "Hey!! Uploaded Successfully"
-        elif "ObjectRemoved" in event_name:
-            message = "Your file {} has been deleted from S3 bucket {}".format(s3_key, s3_bucket)
-            subject = "File Deleted from S3 bucket"
-        else:
-            print("Unexpected event received: {}".format(event_name))
-            return False
-        SNSResult = send_sns(message, subject)
-        if not SNSResult:
-            print("Notification failed to send..")
-            return False
-    print("Notifications sent for all S3 events.")
-    return True
-
-
-
 STEP 5 :
 For the lambda function we have to assign the role of Administrator Access.
 ![image](https://user-images.githubusercontent.com/90970301/229303870-51cb2c1a-3935-41b0-99a6-79199f132da2.png)
