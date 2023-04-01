@@ -1,6 +1,6 @@
 import boto3
 
-topic_arn = ""
+topic_arn = " " # HERE WE SHOULD GIVE THE ARN THAT PRESENT IN THE TOPIC CREATED IN SNS.
 def send_sns(message, subject):
     try:
         client = boto3.client("sns")
